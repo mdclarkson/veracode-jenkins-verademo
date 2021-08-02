@@ -31,11 +31,11 @@ steps:
     TargetFolder: '$(build.artifactstagingdirectory)'
 
 
-- task: CmdLine@2
-  displayName: Veracode SCA
-  inputs:
-    script: |
-        curl -sSL https://download.sourceclear.com/ci.sh | bash -s -- scan --skip-compile --update-advisor
+#- task: CmdLine@2
+#  displayName: Veracode SCA
+#  inputs:
+#    script: |
+#        curl -sSL https://download.sourceclear.com/ci.sh | bash -s -- scan --skip-compile --update-advisor
         
 - task: CmdLine@2
   displayName: Veracode SCA container
