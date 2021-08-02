@@ -37,7 +37,7 @@ steps:
     script: |
         curl -sSL https://download.sourceclear.com/ci.sh | bash -s -- scan --skip-compile --update-advisor
         
-  - task: CmdLine@2
+- task: CmdLine@2
   displayName: Veracode SCA container
   inputs:
     script: |
