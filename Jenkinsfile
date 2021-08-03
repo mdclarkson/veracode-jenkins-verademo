@@ -21,9 +21,7 @@ pipeline {
                 //sh 'doker pull juliantotzek/verademo1-tomcat'
             }
         }
-        stage('Security Scan Master Branch') {
-            when {
-                expression {env.GIT_BRANCH == 'master'}    
+        stage('Security Scan Master Branch') {   
             }
             steps {
                 parallel(
