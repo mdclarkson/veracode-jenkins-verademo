@@ -39,7 +39,7 @@ pipeline {
                             vid: VERACODEID, vkey: VERACODEKEY
                
                         }
-                    },
+                    }
 
         stage ('Veracode SCA') {
             steps {
