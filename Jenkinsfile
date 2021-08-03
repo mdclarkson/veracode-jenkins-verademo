@@ -27,7 +27,7 @@ pipeline {
                     a:{
                          //Policy scan
                         withCredentials([usernamePassword(credentialsId: 'VeracodeAPI', passwordVariable: 'VERACODEKEY', usernameVariable: 'VERACODEID')]) {
-                            veracode applicationName: "Pipeline Jenkins_Verademo_Java_U+S", canFailJob: true, timeout: 60, criticality: 'VeryHigh',
+                            veracode applicationName: "Jenkins_Verademo_Java_U+S", canFailJob: true, timeout: 60, criticality: 'VeryHigh',
                             fileNamePattern: '', replacementPattern: '', scanExcludesPattern: '', scanIncludesPattern: '',
                             scanName: 'build $buildnumber - Jenkins',
                             uploadExcludesPattern: '', uploadIncludesPattern: 'target/*.war', waitForScan: true,
