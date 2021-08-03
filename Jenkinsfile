@@ -1,7 +1,3 @@
-/*
- * Normal Jenkinsfile that will build and do Policy and SCA scans
- */
-
 pipeline {
     agent any
 
@@ -20,86 +16,41 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20'))
     }
 
-    stages{
-        stage ('environment verify') {
+    stages {
+        stage('Build') {
             steps {
-                script {
-                    if (isUnix() == true) {
-                        sh 'pwd'
-                        sh 'ls -la'
-                        sh 'echo $PATH'
-                    }
-                    else {
-                        bat 'dir'
-                        bat 'echo %PATH%'
-                    }
-                }
+                // Compile Java app
+                sh 'mvn clean package'
+                // pull docker container
+                //sh 'doker pull juliantotzek/verademo1-tomcat'
             }
         }
 
-        stage ('build') {
+        stage('Security Scan Master Branch') {
+            when {
+                expression {env.GIT_BRANCH == 'master'}    
+            }
             steps {
-                withMaven(maven:'maven-3') {
-                    script {
-                        if(isUnix() == true) {
-                            sh 'mvn clean package'
+                        withCredentials([usernamePassword(credentialsId: 'VeracodeAPI', passwordVariable: 'VERACODEKEY', usernameVariable: 'VERACODEID')]) {
+                            veracode applicationName: "Jenkins_Verademo_Java_MultiStage", canFailJob: true, timeout: 60, criticality: 'VeryHigh',
+                            fileNamePattern: '', replacementPattern: '', scanExcludesPattern: '', scanIncludesPattern: '',
+                            scanName: 'build $buildnumber - Jenkins',
+                            uploadExcludesPattern: '', uploadIncludesPattern: 'target/*.war', waitForScan: true,
+                            vid: VERACODEID, vkey: VERACODEKEY
+               
                         }
-                        else {
-                            bat 'mvn clean package'
-                        }
-                    }
-                }
-            }
-        }
-
-        stage ('Veracode scan') {
-            steps {
-                script {
-                    if(isUnix() == true) {
-                        env.HOST_OS = 'Unix'
-                    }
-                    else {
-                        env.HOST_OS = 'Windows'
-                    }
-                }
-
-                echo 'Veracode scanning'
-                withCredentials([ usernamePassword ( 
-                    credentialsId: 'veracode_login', usernameVariable: 'VERACODE_API_ID', passwordVariable: 'VERACODE_API_KEY') ]) {
-                        // fire-and-forget 
-                        veracode applicationName: "${VERACODE_APP_NAME}", criticality: 'VeryHigh', debug: true, fileNamePattern: '', pHost: '', pPassword: '', pUser: '', replacementPattern: '', sandboxName: '', scanExcludesPattern: '', scanIncludesPattern: '', scanName: "${BUILD_TAG}-${env.HOST_OS}", uploadExcludesPattern: '', uploadIncludesPattern: 'target/verademo.war', vid: "${VERACODE_API_ID}", vkey: "${VERACODE_API_KEY}"
-
-                        // wait for scan to complete (timeout: x)
-                        //veracode applicationName: '${VERACODE_APP_NAME}'', criticality: 'VeryHigh', debug: true, timeout: 20, fileNamePattern: '', pHost: '', pPassword: '', pUser: '', replacementPattern: '', sandboxName: '', scanExcludesPattern: '', scanIncludesPattern: '', scanName: "${BUILD_TAG}", uploadExcludesPattern: '', uploadIncludesPattern: 'target/verademo.war', vid: '${VERACODE_API_ID}', vkey: '${VERACODE_API_KEY}'
-                    }      
-            }
-        }
+                    },
 
         stage ('Veracode SCA') {
             steps {
                 echo 'Veracode SCA'
-                withCredentials([ string(credentialsId: 'SCA_Token', variable: 'SRCCLR_API_TOKEN')]) {
-                    withMaven(maven:'maven-3') {
-                        script {
-                            if(isUnix() == true) {
-                                sh "curl -sSL https://download.sourceclear.com/ci.sh | sh"
+               withCredentials([string(credentialsId: 'SRCCLR_API_TOKEN', variable: 'SRCCLR_API_TOKEN')]) {
+                            sh 'curl -sSL https://download.sourceclear.com/ci.sh | sh'
 
                                 // debug, no upload
                                 //sh "curl -sSL https://download.sourceclear.com/ci.sh | DEBUG=1 sh -s -- scan --no-upload"
                             }
-                            else {
-                                powershell '''
-                                            Set-ExecutionPolicy AllSigned -Scope Process -Force
-                                            $ProgressPreference = "silentlyContinue"
-                                            iex ((New-Object System.Net.WebClient).DownloadString('https://download.srcclr.com/ci.ps1'))
-                                            srcclr scan
-                                            '''
-                            }
-                        }
-                    }
-                }
-            }
-        }
+                           
 
         // only works on *nix, as we're building a Linux image
         //  uses the natively installed docker
@@ -119,4 +70,7 @@ pipeline {
             }
         }
     }
+}
+}
+}
 }
