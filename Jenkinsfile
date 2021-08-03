@@ -28,7 +28,7 @@ pipeline {
             steps {
                 parallel(
                     a:{
-                         Policy scan
+                         //Policy scan
                         withCredentials([usernamePassword(credentialsId: 'VeracodeAPI', passwordVariable: 'VERACODEKEY', usernameVariable: 'VERACODEID')]) {
                             veracode applicationName: "Jenkins_Verademo_Java_MultiStage", canFailJob: true, timeout: 60, criticality: 'VeryHigh',
                             fileNamePattern: '', replacementPattern: '', scanExcludesPattern: '', scanIncludesPattern: '',
