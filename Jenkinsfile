@@ -22,7 +22,6 @@ pipeline {
             }
         }
         stage('Security Scan Master Branch') {   
-            }
             steps {
                 parallel(
                     a:{
