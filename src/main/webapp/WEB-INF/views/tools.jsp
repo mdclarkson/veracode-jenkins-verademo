@@ -62,7 +62,7 @@
 			<form method="post">
 				<label for="host">Host:</label> <input type="text" name="host"
 					<%if (request.getParameter("host") != null) {%>
-					value="<%=request.getParameter("host")%>" <%}%> /> <input
+					value="<%=org.owasp.encoder.Encode.forHtml(request.getParameter("host"))%>" <%}%> /> <input
 					type="submit" value="Check" />
 			</form>
 			<pre>${ping}</pre>
