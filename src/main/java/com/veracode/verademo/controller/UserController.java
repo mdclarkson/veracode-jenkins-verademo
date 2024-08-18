@@ -148,25 +148,20 @@ public class UserController {
 		}
 
 		Connection connect = null;
-		Statement sqlStatement = null;
+		PreparedStatement sqlStatement = null;
 
 		try {
 			// Get the Database Connection
 			logger.info("Creating the Database connection");
 			Class.forName("com.mysql.jdbc.Driver");
 			connect = DriverManager.getConnection(Constants.create().getJdbcConnectionString());
-
-			/* START BAD CODE */
-			// Execute the query
 			logger.info("Creating the Statement");
-			String sqlQuery = "select username, password, password_hint, created_at, last_login, real_name, blab_name from users where username='"
-					+ username + "' and password='" + md5(password) + "';";
-			sqlStatement = connect.createStatement();
+			String sqlQuery = "select username, password, password_hint, created_at, last_login, real_name, blab_name from users where username=? and password=?;";
+			sqlStatement = connect.prepareStatement(sqlQuery);
 			logger.info("Execute the Statement");
-			ResultSet result = sqlStatement.executeQuery(sqlQuery);
-			/* END BAD CODE */
-
-			// Did we find exactly 1 user that matched?
+			sqlStatement.setString(1, username);
+			sqlStatement.setString(2, md5(password));
+			ResultSet result = sqlStatement.execute();
 			if (result.first()) {
 				logger.info("User Found.");
 				// Remember the username as a courtesy.
@@ -190,6 +185,12 @@ public class UserController {
 				model.addAttribute("target", target);
 				nextView = "login";
 			}
+
+			/* START BAD CODE */
+
+			/* END BAD CODE */
+
+
 		}
 		catch (SQLException exceptSql) {
 			logger.error(exceptSql);
@@ -242,13 +243,12 @@ public class UserController {
 
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-
 			Connection connect = DriverManager.getConnection(Constants.create().getJdbcConnectionString());
-
-			String sql = "SELECT password_hint FROM users WHERE username = '" + username + "'";
+			String sql = "SELECT password_hint FROM users WHERE username = ?";
 			logger.info(sql);
-			Statement statement = connect.createStatement();
-			ResultSet result = statement.executeQuery(sql);
+			PreparedStatement statement = connect.prepareStatement(sql);
+			statement.setString(1, username);
+			ResultSet result = statement.execute();
 			if (result.first()) {
 				String password= result.getString("password_hint");
 				String formatString = "Username '" + username + "' has password: %.2s%s";
@@ -262,6 +262,8 @@ public class UserController {
 			else {
 				return "No password found for " + username;
 			}
+
+
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
@@ -310,10 +312,10 @@ public class UserController {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			Connection connect = DriverManager.getConnection(Constants.create().getJdbcConnectionString());
-
-			String sql = "SELECT username FROM users WHERE username = '" + username + "'";
-			Statement statement = connect.createStatement();
-			ResultSet result = statement.executeQuery(sql);
+			String sql = "SELECT username FROM users WHERE username = ?";
+			PreparedStatement statement = connect.prepareStatement(sql);
+			statement.setString(1, username);
+			ResultSet result = statement.execute();
 			if (result.first()) {
 				model.addAttribute("error", "Username '" + username + "' already exists!");
 				return "register";
@@ -321,6 +323,7 @@ public class UserController {
 			else {
 				return "register-finish";
 			}
+
 		}
 		catch (SQLException | ClassNotFoundException ex) {
 			logger.error(ex);
