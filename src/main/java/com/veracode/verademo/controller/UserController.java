@@ -1,5 +1,6 @@
 package com.veracode.verademo.controller;
 
+import io.github.pixee.security.Filenames;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -652,7 +653,7 @@ public class UserController {
 
 			// TODO: check if file is png first
 			try {
-				String extension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+				String extension = Filenames.toSimpleFileName(file.getOriginalFilename()).substring(file.getOriginalFilename().lastIndexOf("."));
 				String path = imageDir + username + extension;
 
 				logger.info("Saving new profile image: " + path);
