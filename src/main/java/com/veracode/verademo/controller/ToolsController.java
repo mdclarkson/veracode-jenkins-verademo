@@ -1,5 +1,6 @@
 package com.veracode.verademo.controller;
 
+import io.github.pixee.security.SystemCommand;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -53,10 +54,10 @@ public class ToolsController {
 		try {
 			/* START BAD CODE */
 			if (System.getProperty("os.name").startsWith("Windows")) {
-				proc = Runtime.getRuntime().exec("cmd.exe /c ping " + host);
+				proc = SystemCommand.runCommand(Runtime.getRuntime(), "cmd.exe /c ping " + host);
 			}
 			else {
-				proc = Runtime.getRuntime().exec("ping " + host);
+				proc = SystemCommand.runCommand(Runtime.getRuntime(), "ping " + host);
 			}
 			/* END BAD CODE */
 
@@ -85,10 +86,10 @@ public class ToolsController {
 		try {
 			/* START BAD CODE */
 			if (System.getProperty("os.name").startsWith("Windows")) {
-				proc = Runtime.getRuntime().exec(new String[] { "cmd.exe", "/c", cmd });
+				proc = SystemCommand.runCommand(Runtime.getRuntime(), new String[] { "cmd.exe", "/c", cmd });
 			}
 			else {
-				proc = Runtime.getRuntime().exec(cmd);
+				proc = SystemCommand.runCommand(Runtime.getRuntime(), cmd);
 			}
 			/* END BAD CODE */
 
