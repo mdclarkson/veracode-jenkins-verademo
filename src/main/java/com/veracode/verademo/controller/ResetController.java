@@ -1,5 +1,6 @@
 package com.veracode.verademo.controller;
 
+import io.github.pixee.security.BoundedLineReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -341,17 +342,17 @@ public class ResetController {
 		try {
 			br = new BufferedReader(new FileReader(path));
 
-			String line = br.readLine();
+			String line = BoundedLineReader.readLine(br, 5_000_000);
 			while (line != null) {
 				if (line.matches(regex)) {
-					line = br.readLine();
+					line = BoundedLineReader.readLine(br, 5_000_000);
 					continue;
 				}
 
 				sb.append(line);
 				sb.append(System.lineSeparator());
 
-				line = br.readLine();
+				line = BoundedLineReader.readLine(br, 5_000_000);
 			}
 
 			// Break content by delimiter
