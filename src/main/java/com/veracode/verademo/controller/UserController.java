@@ -1,5 +1,6 @@
 package com.veracode.verademo.controller;
 
+import io.github.pixee.security.Newlines;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -710,7 +711,7 @@ public class UserController {
 			// Set content attributes for the response
 			response.setContentType(mimeType);
 			response.setContentLength((int) downloadFile.length());
-			response.setHeader("Content-Disposition", "attachment; filename=" + imageName);
+			response.setHeader("Content-Disposition", Newlines.stripAll("attachment; filename=" + imageName));
 
 			// get output stream of the response
 			outStream = response.getOutputStream();
